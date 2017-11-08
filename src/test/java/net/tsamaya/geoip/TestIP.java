@@ -13,9 +13,7 @@ import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.CountryResponse;
 
-import junit.framework.TestCase;
-
-public class TestIP extends TestCase {
+public class TestIP {
 
 	@Ignore
 	public void testMaxmindFile() {
