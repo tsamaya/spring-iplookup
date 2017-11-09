@@ -17,25 +17,31 @@ import net.tsamaya.geoip.services.IpLookupService;
 @RestController
 public class IpLookupController {
 	private static final Logger log = LoggerFactory.getLogger(IpLookupController.class);
-	
+
 	@Autowired
 	private IpLookupService iplookupService;
 
-	// TODO: not yet finished
 	@RequestMapping(value = "/iplookup", method = RequestMethod.GET)
-	public ResponseEntity<GeoIpLocation> ipLookup(@RequestHeader(value = "X-Forwarded-For", required = false ) String xff, 
-												 @RequestParam(value = "ip", required = false) String ip) throws InvalidIpLocationException {
-		if(log.isDebugEnabled()) {
+	public ResponseEntity<GeoIpLocation> ipLookup(
+			@RequestHeader(value = "X-Forwarded-For", required = false) String xff,
+			@RequestParam(value = "ip", required = false) String ip) throws InvalidIpLocationException {
+		if (log.isDebugEnabled()) {
 			log.debug("/iplookup with ip [{}] and forwarded header [{}]", ip, xff);
 		}
-		String ipToLookup; 
-		if(ip!=null) {
+		if (ip == null && xff ==null) {
+			//TODO: return 404 and not this 500 with technical message
+			throw new InvalidIpLocationException();
+		}
+		
+		String ipToLookup = null;
+		if (ip != null) {
 			ipToLookup = ip;
 		} else {
-			ipToLookup = xff;
+			// consider only the first IP in the comma separated list
+			ipToLookup = xff.split(",")[0];			
 		}
 		GeoIpLocation result = iplookupService.lookup(ipToLookup);
-		
+		// TODO: if(result==null) {throw new InvalidIpLocationException();} 
 		return ResponseEntity.ok(result);
 	}
 
